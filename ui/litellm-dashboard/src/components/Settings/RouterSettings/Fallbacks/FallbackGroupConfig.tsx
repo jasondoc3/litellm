@@ -5,7 +5,7 @@
 
 import { Select, Tooltip } from "antd";
 import { AlertCircle, ArrowDown, X } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 
 export interface FallbackGroup {
   id: string;
@@ -28,8 +28,22 @@ export function FallbackGroupConfig({
   maxFallbacks,
   disablePrimaryModel = false,
 }: FallbackGroupConfigProps) {
+  const [primarySearch, setPrimarySearch] = useState("");
+  const [fallbackSearch, setFallbackSearch] = useState("");
+
   // Filter available options for fallbacks (exclude primary only, allow already selected to be shown for deselection)
   const availableFallbackOptions = availableModels.filter((m) => m !== group.primaryModel);
+
+  // Offer the typed text as an option so model groups the proxy can't
+  // enumerate (e.g. models served via wildcard routes) can still be chosen.
+  // Placed first so Enter selects the literal text rather than
+  // autocompleting to a partial match
+  const primaryOptions =
+    primarySearch && !availableModels.includes(primarySearch) ? [primarySearch, ...availableModels] : availableModels;
+  const fallbackOptions =
+    fallbackSearch && fallbackSearch !== group.primaryModel && !availableFallbackOptions.includes(fallbackSearch)
+      ? [fallbackSearch, ...availableFallbackOptions]
+      : availableFallbackOptions;
 
   const handlePrimaryChange = (value: string) => {
     let newFallbacks = [...group.fallbackModels];
@@ -79,9 +93,10 @@ export function FallbackGroupConfig({
           onChange={handlePrimaryChange}
           disabled={disablePrimaryModel}
           showSearch
+          onSearch={setPrimarySearch}
           getPopupContainer={(trigger) => trigger.parentElement || document.body}
           filterOption={(input, option) => (option?.label ?? "").toLowerCase().includes(input.toLowerCase())}
-          options={availableModels.map((m) => ({ label: m, value: m }))}
+          options={primaryOptions.map((m) => ({ label: m, value: m }))}
         />
         {!disablePrimaryModel && !group.primaryModel && (
           <div className="mt-2 flex items-center gap-2 text-amber-600 text-xs bg-amber-50 p-2 rounded-sm">
@@ -122,7 +137,8 @@ export function FallbackGroupConfig({
               onChange={handleFallbackSelect}
               disabled={!group.primaryModel}
               getPopupContainer={(trigger) => trigger.parentElement || document.body}
-              options={availableFallbackOptions.map((m) => ({
+              onSearch={setFallbackSearch}
+              options={fallbackOptions.map((m) => ({
                 label: m,
                 value: m,
               }))}
