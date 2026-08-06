@@ -10,6 +10,7 @@ import React, { useEffect, useState } from "react";
 import MessageManager from "@/components/molecules/message_manager";
 import NotificationManager from "../../../molecules/notifications_manager";
 import { fetchAvailableModels, ModelGroup } from "@/components/llm_calls/fetch_models";
+import { getFallbackModelOptions } from "./getFallbackModelOptions";
 import { AddFallbacksModal } from "./AddFallbacksModal";
 import { FallbackGroup } from "./FallbackGroupConfig";
 import { FallbackSelectionForm } from "./FallbackSelectionForm";
@@ -64,7 +65,7 @@ export default function AddFallbacks({ accessToken, value = [], onChange }: AddF
     }
   }, [accessToken, isModalVisible]);
 
-  const availableModels = Array.from(new Set(modelInfo.map((option) => option.model_group))).sort();
+  const availableModels = getFallbackModelOptions(modelInfo);
 
   const handleCancel = () => {
     setIsModalVisible(false);

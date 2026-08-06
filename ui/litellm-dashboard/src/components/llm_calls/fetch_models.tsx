@@ -5,6 +5,7 @@ import { modelHubCall } from "@/components/networking";
 export interface ModelGroup {
   model_group: string;
   mode?: string;
+  providers?: string[];
 }
 
 /**
@@ -18,6 +19,7 @@ export const fetchAvailableModels = async (accessToken: string): Promise<ModelGr
       const models: ModelGroup[] = fetchedModels.data.map((item: any) => ({
         model_group: item.model_group, // Display the model_group to the user
         mode: item?.mode, // Save the mode for auto-selection of endpoint type
+        providers: item?.providers,
       }));
 
       // Sort models alphabetically by label

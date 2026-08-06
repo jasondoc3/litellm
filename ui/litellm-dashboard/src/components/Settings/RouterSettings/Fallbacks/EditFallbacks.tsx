@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Pencil } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { fetchAvailableModels } from "@/components/llm_calls/fetch_models";
+import { getFallbackModelOptions } from "./getFallbackModelOptions";
 import NotificationManager from "../../../molecules/notifications_manager";
 import { AddFallbacksModal } from "./AddFallbacksModal";
 import { FallbackGroup, FallbackGroupConfig } from "./FallbackGroupConfig";
@@ -51,10 +52,7 @@ export default function EditFallbacks({
     enabled: Boolean(accessToken),
   });
 
-  const availableModels = useMemo(
-    () => Array.from(new Set(modelGroups.map((option) => option.model_group))).sort(),
-    [modelGroups],
-  );
+  const availableModels = useMemo(() => getFallbackModelOptions(modelGroups), [modelGroups]);
 
   const handleSave = async () => {
     const primaryModel = group.primaryModel;
